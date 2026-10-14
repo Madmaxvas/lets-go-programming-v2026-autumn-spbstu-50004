@@ -14,18 +14,20 @@ func main() {
 	if !scanner.Scan() {
 		return
 	}
+
 	departmentsCount, _ := strconv.Atoi(strings.TrimSpace(scanner.Text()))
 
-	for i := 0; i < departmentsCount; i++ {
+	for i := range departmentsCount {
 		if !scanner.Scan() {
 			return
 		}
+
 		employeesCount, _ := strconv.Atoi(strings.TrimSpace(scanner.Text()))
 
 		minAllowedTemp := 15
 		maxAllowedTemp := 30
 
-		for j := 0; j < employeesCount; j++ {
+		for j := range employeesCount {
 			if !scanner.Scan() {
 				return
 			}
