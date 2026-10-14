@@ -27,13 +27,15 @@ func main() {
 		minAllowedTemp := 15
 		maxAllowedTemp := 30
 
+		const expectedPartsCount = 2
+
 		for range employeesCount {
 			if !scanner.Scan() {
 				return
 			}
 
 			inputParts := strings.Fields(scanner.Text())
-			if len(inputParts) != 2 {
+			if len(inputParts) != expectedPartsCount {
 				continue
 			}
 
