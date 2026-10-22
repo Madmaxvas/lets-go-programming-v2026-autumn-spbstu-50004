@@ -38,6 +38,7 @@ func (tc *TemperatureController) GetOptimal() int {
 	if tc.minTemp <= tc.maxTemp {
 		return tc.minTemp
 	}
+
 	return -1
 }
 
@@ -47,12 +48,14 @@ func main() {
 	if !scanner.Scan() {
 		return
 	}
+
 	departmentsCount, _ := strconv.Atoi(strings.TrimSpace(scanner.Text()))
 
 	for range departmentsCount {
 		if !scanner.Scan() {
 			return
 		}
+
 		employeesCount, _ := strconv.Atoi(strings.TrimSpace(scanner.Text()))
 
 		controller := NewTemperatureController()
