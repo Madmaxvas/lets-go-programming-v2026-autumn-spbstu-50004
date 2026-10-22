@@ -7,12 +7,16 @@ import (
 
 type IntHeap []int
 
-func (h IntHeap) Len() int           { return len(h) }
-func (h IntHeap) Less(i, j int) bool { return h[i] > h[j] }
-func (h IntHeap) Swap(i, j int)      { h[i], h[j] = h[j], h[i] }
+func (h *IntHeap) Len() int           { return len(*h) }
+func (h *IntHeap) Less(i, j int) bool { return (*h)[i] > (*h)[j] }
+func (h *IntHeap) Swap(i, j int)      { (*h)[i], (*h)[j] = (*h)[j], (*h)[i] }
 
 func (h *IntHeap) Push(x any) {
-	*h = append(*h, x.(int))
+	val, ok := x.(int)
+	if !ok {
+		return
+	}
+	*h = append(*h, val)
 }
 
 func (h *IntHeap) Pop() any {
@@ -20,32 +24,40 @@ func (h *IntHeap) Pop() any {
 	n := len(old)
 	x := old[n-1]
 	*h = old[0 : n-1]
+
 	return x
 }
 
 func main() {
-	var n int
-	if _, err := fmt.Scan(&n); err != nil {
+	var dishesCount int
+	if _, err := fmt.Scan(&dishesCount); err != nil {
 		return
 	}
 
-	h := &IntHeap{}
-	for i := 0; i < n; i++ {
+	maxHeap := &IntHeap{}
+
+	for range dishesCount {
 		var val int
-		fmt.Scan(&val)
-		*h = append(*h, val)
+		if _, err := fmt.Scan(&val); err != nil {
+			return
+		}
+		*maxHeap = append(*maxHeap, val)
 	}
 
-	heap.Init(h)
+	heap.Init(maxHeap)
 
-	var k int
-	if _, err := fmt.Scan(&k); err != nil {
+	var targetRank int
+	if _, err := fmt.Scan(&targetRank); err != nil {
 		return
 	}
 
 	var result int
-	for i := 0; i < k; i++ {
-		result = heap.Pop(h).(int)
+	for range targetRank {
+		popped, ok := heap.Pop(maxHeap).(int)
+		if !ok {
+			return
+		}
+		result = popped
 	}
 
 	fmt.Println(result)
