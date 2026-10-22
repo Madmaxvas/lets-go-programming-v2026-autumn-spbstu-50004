@@ -16,6 +16,7 @@ func (h *IntHeap) Push(x any) {
 	if !ok {
 		return
 	}
+
 	*h = append(*h, val)
 }
 
@@ -41,6 +42,7 @@ func main() {
 		if _, err := fmt.Scan(&val); err != nil {
 			return
 		}
+
 		*maxHeap = append(*maxHeap, val)
 	}
 
@@ -52,11 +54,13 @@ func main() {
 	}
 
 	var result int
+
 	for range targetRank {
 		popped, ok := heap.Pop(maxHeap).(int)
 		if !ok {
 			return
 		}
+
 		result = popped
 	}
 
