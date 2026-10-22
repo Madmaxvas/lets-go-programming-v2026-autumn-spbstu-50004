@@ -8,26 +8,54 @@ import (
 	"strings"
 )
 
+const (
+	defaultMinTemp     = 15
+	defaultMaxTemp     = 30
+	expectedPartsCount = 2
+)
+
+type TemperatureController struct {
+	minTemp int
+	maxTemp int
+}
+
+func NewTemperatureController() *TemperatureController {
+	return &TemperatureController{
+		minTemp: defaultMinTemp,
+		maxTemp: defaultMaxTemp,
+	}
+}
+
+func (tc *TemperatureController) ApplyConstraint(operator string, desiredTemp int) {
+	if operator == ">=" && desiredTemp > tc.minTemp {
+		tc.minTemp = desiredTemp
+	} else if operator == "<=" && desiredTemp < tc.maxTemp {
+		tc.maxTemp = desiredTemp
+	}
+}
+
+func (tc *TemperatureController) GetOptimal() int {
+	if tc.minTemp <= tc.maxTemp {
+		return tc.minTemp
+	}
+	return -1
+}
+
 func main() {
 	scanner := bufio.NewScanner(os.Stdin)
 
 	if !scanner.Scan() {
 		return
 	}
-
 	departmentsCount, _ := strconv.Atoi(strings.TrimSpace(scanner.Text()))
 
 	for range departmentsCount {
 		if !scanner.Scan() {
 			return
 		}
-
 		employeesCount, _ := strconv.Atoi(strings.TrimSpace(scanner.Text()))
 
-		minAllowedTemp := 15
-		maxAllowedTemp := 30
-
-		const expectedPartsCount = 2
+		controller := NewTemperatureController()
 
 		for range employeesCount {
 			if !scanner.Scan() {
@@ -42,21 +70,8 @@ func main() {
 			operator := inputParts[0]
 			desiredTemp, _ := strconv.Atoi(inputParts[1])
 
-			if operator == ">=" {
-				if desiredTemp > minAllowedTemp {
-					minAllowedTemp = desiredTemp
-				}
-			} else if operator == "<=" {
-				if desiredTemp < maxAllowedTemp {
-					maxAllowedTemp = desiredTemp
-				}
-			}
-
-			if minAllowedTemp <= maxAllowedTemp {
-				fmt.Println(minAllowedTemp)
-			} else {
-				fmt.Println("-1")
-			}
+			controller.ApplyConstraint(operator, desiredTemp)
+			fmt.Println(controller.GetOptimal())
 		}
 	}
 }
