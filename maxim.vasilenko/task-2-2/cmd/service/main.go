@@ -3,65 +3,53 @@ package main
 import (
 	"container/heap"
 	"fmt"
+
+	"github.com/Madmaxvas/task-2-2/maxheap"
 )
-
-type IntHeap []int
-
-func (h *IntHeap) Len() int           { return len(*h) }
-func (h *IntHeap) Less(i, j int) bool { return (*h)[i] > (*h)[j] }
-func (h *IntHeap) Swap(i, j int)      { (*h)[i], (*h)[j] = (*h)[j], (*h)[i] }
-
-func (h *IntHeap) Push(x any) {
-	val, ok := x.(int)
-	if !ok {
-		return
-	}
-
-	*h = append(*h, val)
-}
-
-func (h *IntHeap) Pop() any {
-	old := *h
-	n := len(old)
-	x := old[n-1]
-	*h = old[0 : n-1]
-
-	return x
-}
 
 func main() {
 	var dishesCount int
 	if _, err := fmt.Scan(&dishesCount); err != nil {
+		fmt.Println(fmt.Errorf("ошибка чтения количества блюд: %w", err))
 		return
 	}
 
-	maxHeap := &IntHeap{}
+	mh := &maxheap.IntHeap{}
 
 	for range dishesCount {
 		var val int
 		if _, err := fmt.Scan(&val); err != nil {
+			fmt.Println(fmt.Errorf("ошибка чтения оценки блюда: %w", err))
 			return
 		}
 
-		*maxHeap = append(*maxHeap, val)
+		*mh = append(*mh, val)
 	}
 
-	heap.Init(maxHeap)
+	heap.Init(mh)
 
 	var targetRank int
 	if _, err := fmt.Scan(&targetRank); err != nil {
+		fmt.Println(fmt.Errorf("ошибка чтения искомой позиции: %w", err))
 		return
 	}
 
 	var result int
 
 	for range targetRank {
-		popped, ok := heap.Pop(maxHeap).(int)
-		if !ok {
+		popped := heap.Pop(mh)
+		if popped == nil {
+			fmt.Println("ошибка: куча пуста")
 			return
 		}
 
-		result = popped
+		val, ok := popped.(int)
+		if !ok {
+			fmt.Println("ошибка: неверный тип извлеченного элемента")
+			return
+		}
+
+		result = val
 	}
 
 	fmt.Println(result)
