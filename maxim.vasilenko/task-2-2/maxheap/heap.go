@@ -3,7 +3,6 @@ package maxheap
 type IntHeap []int
 
 func (h *IntHeap) Len() int {
-
 	return len(*h)
 }
 
@@ -34,13 +33,14 @@ func (h *IntHeap) Push(x any) {
 
 func (h *IntHeap) Pop() any {
 	old := *h
-	n := len(old)
-	if n == 0 {
+	oldLen := len(old)
+
+	if oldLen == 0 {
 		return nil
 	}
 
-	x := old[n-1]
-	*h = old[0 : n-1]
+	x := old[oldLen-1]
+	*h = old[0 : oldLen-1]
 
 	return x
 }
