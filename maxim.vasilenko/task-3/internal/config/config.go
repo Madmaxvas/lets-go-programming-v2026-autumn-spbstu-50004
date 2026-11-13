@@ -1,12 +1,15 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"strings"
 
 	"gopkg.in/yaml.v3"
 )
+
+var ErrInvalidConfig = errors.New("invalid config: input-file and output-file are required")
 
 type Config struct {
 	InputFile  string `yaml:"input-file"`
@@ -28,7 +31,7 @@ func Load(path string) (*Config, error) {
 	cfg.OutputFile = strings.TrimSpace(cfg.OutputFile)
 
 	if cfg.InputFile == "" || cfg.OutputFile == "" {
-		return nil, fmt.Errorf("invalid config: input-file and output-file are required")
+		return nil, ErrInvalidConfig
 	}
 
 	return &cfg, nil
