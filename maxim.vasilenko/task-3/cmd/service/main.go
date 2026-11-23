@@ -7,8 +7,10 @@ import (
 	"github.com/Madmaxvas/task-3/internal/currency"
 )
 
+const defaultConfigPath = "config.yaml"
+
 func main() {
-	configPath := flag.String("config", "", "path to configuration file")
+	configPath := flag.String("config", defaultConfigPath, "path to configuration file")
 	flag.Parse()
 
 	if *configPath == "" {

@@ -16,20 +16,43 @@ import (
 
 const dirPermissions = 0o755
 
-type valCurs struct {
-	Valutes []rawValute `xml:"Valute"`
+type CommaFloat float64
+
+func (cf *CommaFloat) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var raw string
+	if err := d.DecodeElement(&raw, &start); err != nil {
+		return fmt.Errorf("failed to decode xml element: %w", err)
+	}
+
+	cleaned := strings.ReplaceAll(strings.TrimSpace(raw), ",", ".")
+
+	val, err := strconv.ParseFloat(cleaned, 64)
+	if err != nil {
+		return fmt.Errorf("failed to parse float %q: %w", raw, err)
+	}
+
+	*cf = CommaFloat(val)
+
+	return nil
 }
 
-type rawValute struct {
-	NumCode  int    `xml:"NumCode"`
-	CharCode string `xml:"CharCode"`
-	Value    string `xml:"Value"`
+func (cf CommaFloat) MarshalJSON() ([]byte, error) {
+	data, err := json.Marshal(float64(cf))
+	if err != nil {
+		return nil, fmt.Errorf("failed to marshal float to json: %w", err)
+	}
+
+	return data, nil
+}
+
+type valCurs struct {
+	Valutes []Currency `xml:"Valute"`
 }
 
 type Currency struct {
-	NumCode  int     `json:"num_code"`
-	CharCode string  `json:"char_code"`
-	Value    float64 `json:"value"`
+	NumCode  int        `xml:"NumCode"  json:"num_code"`
+	CharCode string     `xml:"CharCode" json:"char_code"`
+	Value    CommaFloat `xml:"Value"    json:"value"`
 }
 
 func ParseXML(filePath string) ([]Currency, error) {
@@ -46,24 +69,11 @@ func ParseXML(filePath string) ([]Currency, error) {
 		return nil, fmt.Errorf("failed to decode xml: %w", err)
 	}
 
-	currencies := make([]Currency, 0, len(parsedCurs.Valutes))
-
-	for _, item := range parsedCurs.Valutes {
-		valStr := strings.ReplaceAll(strings.TrimSpace(item.Value), ",", ".")
-
-		parsedVal, err := strconv.ParseFloat(valStr, 64)
-		if err != nil {
-			return nil, fmt.Errorf("failed to parse currency value %q: %w", item.Value, err)
-		}
-
-		currencies = append(currencies, Currency{
-			NumCode:  item.NumCode,
-			CharCode: strings.TrimSpace(item.CharCode),
-			Value:    parsedVal,
-		})
+	for idx := range parsedCurs.Valutes {
+		parsedCurs.Valutes[idx].CharCode = strings.TrimSpace(parsedCurs.Valutes[idx].CharCode)
 	}
 
-	return currencies, nil
+	return parsedCurs.Valutes, nil
 }
 
 func SortByValueDesc(currencies []Currency) {
